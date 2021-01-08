@@ -15,7 +15,7 @@ The Backend of Uber Eats Clone
 ## User CRUD:
 
 - Create Account
-- Lig In
+- Log In
 - See Profile
 - Edit Profile
 - Vertify Email
