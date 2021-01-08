@@ -2,7 +2,7 @@
 
 The Backend of Uber Eats Clone
 
-## User Model:
+## User Entity:
 
 - id
 - createdAt
