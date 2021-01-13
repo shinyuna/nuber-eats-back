@@ -4,10 +4,11 @@ import { Repository } from 'typeorm';
 import { CreateAccountInput, CreateAccountOutput } from './dtos/create-account.dto';
 import { LoginInput } from './dtos/login.dto';
 import { User } from './entities/user.entity';
+import { JwtService } from 'src/jwt/jwt.service';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private readonly users: Repository<User>) {}
+  constructor(@InjectRepository(User) private readonly users: Repository<User>, private readonly jwtService: JwtService) {}
 
   async createAccount({ email, password, role }: CreateAccountInput): Promise<{ ok: boolean; error?: string }> {
     // check new user -> create user & hash the password
@@ -34,9 +35,14 @@ export class UsersService {
       if (!passwordCorrect) {
         return { ok: false, error: 'Wrong id or password' };
       }
-      return { ok: true, token: 'lalallala' };
+      const token = this.jwtService.sign(user.id);
+      return { ok: true, token };
     } catch (e) {
       return { ok: false, error: e };
     }
+  }
+
+  async findById(id: number): Promise<User> {
+    return this.users.findOne({ id });
   }
 }
