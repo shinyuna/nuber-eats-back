@@ -6,6 +6,7 @@ import { CreateAccountInput, CreateAccountOutput } from './dtos/create-account.d
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto';
+import { VertifyEmailInput, VertifyEmailOutput } from './dtos/vetify-email.dto';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -76,4 +77,7 @@ export class UsersResolver {
       };
     }
   }
+
+  @Mutation(returns => VertifyEmailOutput)
+  vertifyEmail(@Args('input') vertifyEmail: VertifyEmailInput) {}
 }

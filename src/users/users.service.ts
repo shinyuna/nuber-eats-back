@@ -6,10 +6,15 @@ import { LoginInput } from './dtos/login.dto';
 import { User } from './entities/user.entity';
 import { JwtService } from 'src/jwt/jwt.service';
 import { EditProfileInput } from './dtos/edit-profile.dto';
+import { Vertification } from './entities/vertification.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private readonly users: Repository<User>, private readonly jwtService: JwtService) {}
+  constructor(
+    @InjectRepository(User) private readonly users: Repository<User>,
+    @InjectRepository(Vertification) private readonly vertification: Repository<Vertification>,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async createAccount({ email, password, role }: CreateAccountInput): Promise<{ ok: boolean; error?: string }> {
     // check new user -> create user & hash the password
@@ -18,7 +23,8 @@ export class UsersService {
       if (exists) {
         return { ok: false, error: 'There is a user wite that email already' };
       }
-      await this.users.save(this.users.create({ email, password, role }));
+      const user = await this.users.save(this.users.create({ email, password, role }));
+      await this.vertification.save(this.vertification.create({ user }));
       return { ok: true };
     } catch (e) {
       return { ok: false, error: "Couldn't create account" };
@@ -51,6 +57,8 @@ export class UsersService {
     const user = await this.users.findOne(userId);
     if (email) {
       user.email = email;
+      user.vertify = false;
+      await this.vertification.save(this.vertification.create({ user }));
     }
     if (password) {
       user.password = password;
