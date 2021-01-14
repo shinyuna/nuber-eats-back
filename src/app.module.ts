@@ -10,6 +10,7 @@ import { User } from './users/entities/user.entity';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
 import { Vertification } from './users/entities/vertification.entity';
+import { MailModule } from './mail/mail.module';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -35,11 +36,20 @@ import { Vertification } from './users/entities/vertification.entity';
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         PRIVATE_KEY: Joi.string().required(),
+        MAILGUN_API_KEY: Joi.string().required(),
+        MAILGUN_DOMAIN_NAMW: Joi.string().required(),
+        MAILGUN_FROM_EMAIL: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot({ autoSchemaFile: true, context: ({ req }) => ({ user: req['user'] }) }),
     JwtModule.forRoot({ privateKey: process.env.PRIVATE_KEY }),
+    MailModule.forRoot({
+      apiKey: process.env.MAILGUN_API_KEY,
+      domain: process.env.MAILGUN_DOMAIN_NAMW,
+      fromEmail: process.env.MAILGUN_FROM_EMAIL,
+    }),
     UsersModule,
+    MailModule,
   ],
   controllers: [],
   providers: [],

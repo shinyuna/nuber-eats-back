@@ -77,7 +77,7 @@ export class UsersService {
       if (password) {
         user.password = password;
       }
-      this.users.save(user);
+      await this.users.save(user);
       return { ok: true };
     } catch (error) {
       return {
@@ -92,7 +92,8 @@ export class UsersService {
       const vertification = await this.vertification.findOne({ code }, { relations: ['user'] });
       if (vertification) {
         vertification.user.vertify = true;
-        this.users.save(vertification.user);
+        await this.users.save(vertification.user);
+        await this.vertification.delete(vertification.id);
         return { ok: true };
       }
       return { ok: false, error: 'Vertification not foune.' };
