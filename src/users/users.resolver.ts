@@ -16,26 +16,12 @@ export class UsersResolver {
 
   @Mutation(returns => CreateAccountOutput)
   async createAccount(@Args('input') createAccountInput: CreateAccountInput): Promise<CreateAccountOutput> {
-    try {
-      return this.userService.createAccount(createAccountInput);
-    } catch (e) {
-      return {
-        ok: false,
-        error: e,
-      };
-    }
+    return this.userService.createAccount(createAccountInput);
   }
 
   @Mutation(returns => LoginOutput)
   async login(@Args('input') loginInput: LoginInput): Promise<LoginOutput> {
-    try {
-      return this.userService.login(loginInput);
-    } catch (e) {
-      return {
-        ok: false,
-        error: e,
-      };
-    }
+    return this.userService.login(loginInput);
   }
 
   @UseGuards(AuthGuard)
@@ -46,38 +32,18 @@ export class UsersResolver {
 
   @UseGuards(AuthGuard)
   @Query(returns => UserProfileOutput)
-  async userProfile(@Args() userProfileInput: UserProfileInput): Promise<UserProfileOutput> {
-    try {
-      const user = await this.userService.findById(userProfileInput.userId);
-      if (!user) {
-        throw Error();
-      }
-      return {
-        ok: true,
-        user,
-      };
-    } catch (error) {
-      return {
-        ok: false,
-        error: 'User Not Found',
-      };
-    }
+  async userProfile(@Args() { userId }: UserProfileInput): Promise<UserProfileOutput> {
+    return this.userService.findById(userId);
   }
 
   @UseGuards(AuthGuard)
   @Mutation(returns => EditProfileOutput)
   async editProfile(@AuthUser() authUser: User, @Args('input') editProfileInput: EditProfileInput): Promise<EditProfileOutput> {
-    try {
-      await this.userService.editProfile(authUser.id, editProfileInput);
-      return { ok: true };
-    } catch (error) {
-      return {
-        ok: false,
-        error,
-      };
-    }
+    return this.userService.editProfile(authUser.id, editProfileInput);
   }
 
   @Mutation(returns => VertifyEmailOutput)
-  vertifyEmail(@Args('input') vertifyEmail: VertifyEmailInput) {}
+  async vertifyEmail(@Args('input') { code }: VertifyEmailInput): Promise<VertifyEmailOutput> {
+    return this.userService.vertifyEmail(code);
+  }
 }

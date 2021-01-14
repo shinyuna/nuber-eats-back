@@ -5,8 +5,10 @@ import { CreateAccountInput, CreateAccountOutput } from './dtos/create-account.d
 import { LoginInput } from './dtos/login.dto';
 import { User } from './entities/user.entity';
 import { JwtService } from 'src/jwt/jwt.service';
-import { EditProfileInput } from './dtos/edit-profile.dto';
+import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
 import { Vertification } from './entities/vertification.entity';
+import { VertifyEmailOutput } from './dtos/vetify-email.dto';
+import { UserProfileOutput } from './dtos/user-profile.dto';
 
 @Injectable()
 export class UsersService {
@@ -34,7 +36,6 @@ export class UsersService {
   async login({ email, password }: LoginInput): Promise<{ ok: boolean; error?: string; token?: string }> {
     // find user email -> check password -> make a JWT and give to the user
     try {
-      const user = await this.users.findOne({ email });
       const user = await this.users.findOne({ email }, { select: ['id', 'password'] });
       if (!user) {
         return { ok: false, error: 'User not found.' };
@@ -50,20 +51,53 @@ export class UsersService {
     }
   }
 
-  async findById(id: number): Promise<User> {
-    return this.users.findOne({ id });
+  async findById(id: number): Promise<UserProfileOutput> {
+    try {
+      const user = await this.users.findOne({ id });
+      return {
+        ok: false,
+        user,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'User Not Found',
+      };
+    }
   }
 
-  async editProfile(userId: number, { email, password }: EditProfileInput) {
-    const user = await this.users.findOne(userId);
-    if (email) {
-      user.email = email;
-      user.vertify = false;
-      await this.vertification.save(this.vertification.create({ user }));
+  async editProfile(userId: number, { email, password }: EditProfileInput): Promise<EditProfileOutput> {
+    try {
+      const user = await this.users.findOne(userId);
+      if (email) {
+        user.email = email;
+        user.vertify = false;
+        await this.vertification.save(this.vertification.create({ user }));
+      }
+      if (password) {
+        user.password = password;
+      }
+      this.users.save(user);
+      return { ok: true };
+    } catch (error) {
+      return {
+        ok: false,
+        error,
+      };
     }
-    if (password) {
-      user.password = password;
+  }
+
+  async vertifyEmail(code: string): Promise<VertifyEmailOutput> {
+    try {
+      const vertification = await this.vertification.findOne({ code }, { relations: ['user'] });
+      if (vertification) {
+        vertification.user.vertify = true;
+        this.users.save(vertification.user);
+        return { ok: true };
+      }
+      return { ok: false, error: 'Vertification not foune.' };
+    } catch (error) {
+      return { ok: false, error };
     }
-    return this.users.save(user);
   }
 }
