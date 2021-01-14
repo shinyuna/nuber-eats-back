@@ -35,6 +35,7 @@ export class UsersService {
     // find user email -> check password -> make a JWT and give to the user
     try {
       const user = await this.users.findOne({ email });
+      const user = await this.users.findOne({ email }, { select: ['id', 'password'] });
       if (!user) {
         return { ok: false, error: 'User not found.' };
       }
