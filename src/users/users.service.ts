@@ -25,7 +25,7 @@ export class UsersService {
     try {
       const exists = await this.users.findOne({ email });
       if (exists) {
-        return { ok: false, error: 'There is a user wite that email already' };
+        return { ok: false, error: 'There is a user with that email already' };
       }
       const user = await this.users.save(this.users.create({ email, password, role }));
       const { code } = await this.vertification.save(this.vertification.create({ user }));
@@ -51,15 +51,15 @@ export class UsersService {
       const token = this.jwtService.sign(user.id);
       return { ok: true, token };
     } catch (e) {
-      return { ok: false, error: e };
+      return { ok: false, error: "Can't log user in." };
     }
   }
 
   async findById(id: number): Promise<UserProfileOutput> {
     try {
-      const user = await this.users.findOne({ id });
+      const user = await this.users.findOneOrFail({ id });
       return {
-        ok: false,
+        ok: true,
         user,
       };
     } catch (error) {
