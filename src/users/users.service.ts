@@ -88,7 +88,7 @@ export class UsersService {
     } catch (error) {
       return {
         ok: false,
-        error,
+        error: 'Could not update profile',
       };
     }
   }
@@ -104,7 +104,7 @@ export class UsersService {
       }
       return { ok: false, error: 'Vertification not foune.' };
     } catch (error) {
-      return { ok: false, error };
+      return { ok: false, error: 'Could not vertify email' };
     }
   }
 }
