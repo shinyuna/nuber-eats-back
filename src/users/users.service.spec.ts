@@ -140,7 +140,7 @@ describe('UserService', () => {
 
       const result = await service.login(loginArgs);
 
-      expect(result).toEqual({ ok: false, error: 'Wrong id or password' });
+      expect(result).toEqual({ ok: false, error: 'Wrong password' });
     });
     it('should get token if password correct', async () => {
       const mockedUser = {
