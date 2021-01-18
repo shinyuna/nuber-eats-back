@@ -28,8 +28,8 @@ export class MailService {
     }
   }
 
-  sendVertificationEmail(email: string, code: string) {
-    this.sendEmail('Vertify Your Email', 'email_confirm_template', [
+  sendVerificationEmail(email: string, code: string) {
+    this.sendEmail('Verify Your Email', 'email_confirm_template', [
       { key: 'username', value: email },
       { key: 'code', value: code },
     ]);

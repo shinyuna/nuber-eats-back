@@ -16,7 +16,7 @@ registerEnumType(UserRole, { name: 'UserRole' });
 @ObjectType()
 @Entity()
 export class User extends CoreEntity {
-  @Column()
+  @Column({ unique: true })
   @Field(type => String)
   @IsString()
   email: string;
@@ -33,7 +33,7 @@ export class User extends CoreEntity {
 
   @Column({ default: false })
   @Field(type => Boolean)
-  vertify: boolean;
+  verify: boolean;
 
   @BeforeInsert()
   @BeforeUpdate()

@@ -6,8 +6,8 @@ import { LoginInput } from './dtos/login.dto';
 import { User } from './entities/user.entity';
 import { JwtService } from 'src/jwt/jwt.service';
 import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto';
-import { Vertification } from './entities/vertification.entity';
-import { VertifyEmailOutput } from './dtos/vetify-email.dto';
+import { Verification } from './entities/verification.entity';
+import { VerifyEmailOutput } from './dtos/vetify-email.dto';
 import { UserProfileOutput } from './dtos/user-profile.dto';
 import { MailService } from 'src/mail/mail.service';
 
@@ -15,7 +15,7 @@ import { MailService } from 'src/mail/mail.service';
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly users: Repository<User>,
-    @InjectRepository(Vertification) private readonly vertification: Repository<Vertification>,
+    @InjectRepository(Verification) private readonly verification: Repository<Verification>,
     private readonly jwtService: JwtService,
     private readonly emailService: MailService,
   ) {}
@@ -28,9 +28,9 @@ export class UsersService {
         return { ok: false, error: 'There is a user with that email already' };
       }
       const user = await this.users.save(this.users.create({ email, password, role }));
-      const { code } = await this.vertification.save(this.vertification.create({ user }));
+      const { code } = await this.verification.save(this.verification.create({ user }));
       const username = user.email.slice(0, user.email.indexOf('@'));
-      this.emailService.sendVertificationEmail(username, code);
+      this.emailService.sendVerificationEmail(username, code);
       return { ok: true };
     } catch (e) {
       return { ok: false, error: "Couldn't create account" };
@@ -75,10 +75,10 @@ export class UsersService {
       const user = await this.users.findOne(userId);
       if (email) {
         user.email = email;
-        user.vertify = false;
-        const { code } = await this.vertification.save(this.vertification.create({ user }));
+        user.verify = false;
+        const { code } = await this.verification.save(this.verification.create({ user }));
         const username = user.email.slice(0, user.email.indexOf('@'));
-        this.emailService.sendVertificationEmail(username, code);
+        this.emailService.sendVerificationEmail(username, code);
       }
       if (password) {
         user.password = password;
@@ -93,18 +93,18 @@ export class UsersService {
     }
   }
 
-  async vertifyEmail(code: string): Promise<VertifyEmailOutput> {
+  async verifyEmail(code: string): Promise<VerifyEmailOutput> {
     try {
-      const vertification = await this.vertification.findOne({ code }, { relations: ['user'] });
-      if (vertification) {
-        vertification.user.vertify = true;
-        await this.users.save(vertification.user);
-        await this.vertification.delete(vertification.id);
+      const verification = await this.verification.findOne({ code }, { relations: ['user'] });
+      if (verification) {
+        verification.user.verify = true;
+        await this.users.save(verification.user);
+        await this.verification.delete(verification.id);
         return { ok: true };
       }
-      return { ok: false, error: 'Vertification not foune.' };
+      return { ok: false, error: 'Verification not foune.' };
     } catch (error) {
-      return { ok: false, error: 'Could not vertify email' };
+      return { ok: false, error: 'Could not verify email' };
     }
   }
 }

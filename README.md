@@ -18,4 +18,4 @@ The Backend of Uber Eats Clone
 - Log In
 - See Profile
 - Edit Profile
-- Vertify Email
+- Verify Email

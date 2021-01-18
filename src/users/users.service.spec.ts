@@ -4,7 +4,7 @@ import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { Vertification } from './entities/vertification.entity';
+import { Verification } from './entities/verification.entity';
 import { UsersService } from './users.service';
 
 const mockRepository = () => ({
@@ -16,10 +16,10 @@ const mockRepository = () => ({
 });
 const mockJwtService = () => ({
   sign: jest.fn(() => 'signe-token-baby'),
-  vertify: jest.fn(),
+  verify: jest.fn(),
 });
 const mockMailService = () => ({
-  sendVertificationEmail: jest.fn(),
+  sendVerificationEmail: jest.fn(),
 });
 
 type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
@@ -27,7 +27,7 @@ type MockRepository<T = any> = Partial<Record<keyof Repository<T>, jest.Mock>>;
 describe('UserService', () => {
   let service: UsersService;
   let usersRepository: MockRepository<User>;
-  let vertificationRepository: MockRepository<Vertification>;
+  let verificationRepository: MockRepository<Verification>;
   let mailService: MailService;
   let jwtService: JwtService;
 
@@ -40,7 +40,7 @@ describe('UserService', () => {
           useValue: mockRepository(),
         },
         {
-          provide: getRepositoryToken(Vertification),
+          provide: getRepositoryToken(Verification),
           useValue: mockRepository(),
         },
         {
@@ -57,7 +57,7 @@ describe('UserService', () => {
     mailService = module.get<MailService>(MailService);
     jwtService = module.get<JwtService>(JwtService);
     usersRepository = module.get(getRepositoryToken(User));
-    vertificationRepository = module.get(getRepositoryToken(Vertification));
+    verificationRepository = module.get(getRepositoryToken(Verification));
   });
 
   it('should be defined', () => {
@@ -87,8 +87,8 @@ describe('UserService', () => {
       usersRepository.findOne.mockReturnValue(undefined);
       usersRepository.create.mockReturnValue(createAccountArgs);
       usersRepository.save.mockResolvedValue(createAccountArgs);
-      vertificationRepository.create.mockReturnValue({ user: createAccountArgs });
-      vertificationRepository.save.mockResolvedValue({ code: 'code' });
+      verificationRepository.create.mockReturnValue({ user: createAccountArgs });
+      verificationRepository.save.mockResolvedValue({ code: 'code' });
       // Run Fuc
       const result = await service.createAccount(createAccountArgs);
       // Testing
@@ -98,13 +98,13 @@ describe('UserService', () => {
       expect(usersRepository.save).toHaveBeenCalledTimes(1);
       expect(usersRepository.save).toHaveBeenCalledWith(createAccountArgs);
 
-      expect(vertificationRepository.create).toHaveBeenCalledWith({ user: createAccountArgs });
-      expect(vertificationRepository.save).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.create).toHaveBeenCalledWith({ user: createAccountArgs });
+      expect(verificationRepository.save).toHaveBeenCalledTimes(1);
 
-      expect(vertificationRepository.save).toHaveBeenCalledWith({ user: createAccountArgs });
+      expect(verificationRepository.save).toHaveBeenCalledWith({ user: createAccountArgs });
 
-      expect(mailService.sendVertificationEmail).toHaveBeenCalledTimes(1);
-      expect(mailService.sendVertificationEmail).toHaveBeenCalledWith(expect.any(String), expect.any(String));
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(expect.any(String), expect.any(String));
 
       expect(result).toEqual({ ok: true });
     });
@@ -186,30 +186,30 @@ describe('UserService', () => {
       };
       const oldUser = {
         email: 'test@test.com',
-        vertify: true,
+        verify: true,
       };
-      const newVertification = {
+      const newVerification = {
         code: 'new_code',
       };
       const newUser = {
-        vertify: false,
+        verify: false,
         email: editProfileArgs.input.email,
       };
 
       usersRepository.findOne.mockResolvedValue(oldUser);
-      vertificationRepository.create.mockReturnValue(newVertification);
-      vertificationRepository.save.mockResolvedValue(newVertification);
+      verificationRepository.create.mockReturnValue(newVerification);
+      verificationRepository.save.mockResolvedValue(newVerification);
 
       const result = await service.editProfile(editProfileArgs.userId, editProfileArgs.input);
 
       expect(usersRepository.findOne).toHaveBeenCalledTimes(1);
       expect(usersRepository.findOne).toHaveBeenCalledWith(editProfileArgs.userId);
 
-      expect(vertificationRepository.create).toHaveBeenCalledWith({ user: newUser });
-      expect(vertificationRepository.save).toHaveBeenCalledWith(newVertification);
+      expect(verificationRepository.create).toHaveBeenCalledWith({ user: newUser });
+      expect(verificationRepository.save).toHaveBeenCalledWith(newVerification);
 
-      expect(mailService.sendVertificationEmail).toHaveBeenCalledTimes(1);
-      expect(mailService.sendVertificationEmail).toHaveBeenCalledWith('new', newVertification.code);
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledWith('new', newVerification.code);
 
       expect(result).toEqual({ ok: true });
     });
@@ -232,38 +232,38 @@ describe('UserService', () => {
     });
   });
 
-  describe('vertifyEmail', () => {
-    it('should vertify email', async () => {
-      const mockedVertification = {
+  describe('verifyEmail', () => {
+    it('should verify email', async () => {
+      const mockedVerification = {
         user: {
-          vertify: false,
+          verify: false,
         },
         id: 1,
       };
-      vertificationRepository.findOne.mockResolvedValue(mockedVertification);
+      verificationRepository.findOne.mockResolvedValue(mockedVerification);
 
-      const result = await service.vertifyEmail('');
+      const result = await service.verifyEmail('');
 
-      expect(vertificationRepository.findOne).toHaveBeenCalledTimes(1);
-      expect(vertificationRepository.findOne).toHaveBeenCalledWith(expect.any(Object), expect.any(Object));
+      expect(verificationRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.findOne).toHaveBeenCalledWith(expect.any(Object), expect.any(Object));
 
       expect(usersRepository.save).toHaveBeenCalledTimes(1);
-      expect(usersRepository.save).toHaveBeenCalledWith({ vertify: true });
+      expect(usersRepository.save).toHaveBeenCalledWith({ verify: true });
 
-      expect(vertificationRepository.delete).toHaveBeenCalledTimes(1);
-      expect(vertificationRepository.delete).toHaveBeenCalledWith(mockedVertification.id);
+      expect(verificationRepository.delete).toHaveBeenCalledTimes(1);
+      expect(verificationRepository.delete).toHaveBeenCalledWith(mockedVerification.id);
 
       expect(result).toEqual({ ok: true });
     });
-    it('should fail on vertification not found', async () => {
-      vertificationRepository.findOne.mockResolvedValue(undefined);
-      const result = await service.vertifyEmail('');
-      expect(result).toEqual({ ok: false, error: 'Vertification not foune.' });
+    it('should fail on verification not found', async () => {
+      verificationRepository.findOne.mockResolvedValue(undefined);
+      const result = await service.verifyEmail('');
+      expect(result).toEqual({ ok: false, error: 'Verification not foune.' });
     });
     it('should fail on exception', async () => {
-      vertificationRepository.findOne.mockRejectedValue(new Error());
-      const result = await service.vertifyEmail('');
-      expect(result).toEqual({ ok: false, error: 'Could not vertify email' });
+      verificationRepository.findOne.mockRejectedValue(new Error());
+      const result = await service.verifyEmail('');
+      expect(result).toEqual({ ok: false, error: 'Could not verify email' });
     });
   });
 });

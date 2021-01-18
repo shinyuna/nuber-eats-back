@@ -43,7 +43,7 @@ describe('JwtService', () => {
     });
   });
 
-  describe('vertify', () => {
+  describe('verify', () => {
     it('should return the decoded token', () => {
       const TOKEN = 'TOKEN';
       const decodedToken = service.verify(TOKEN);
