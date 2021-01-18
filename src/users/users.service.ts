@@ -76,6 +76,7 @@ export class UsersService {
       if (email) {
         user.email = email;
         user.verify = false;
+        this.verification.delete({ user: { id: user.id } });
         const { code } = await this.verification.save(this.verification.create({ user }));
         const username = user.email.slice(0, user.email.indexOf('@'));
         this.emailService.sendVerificationEmail(username, code);

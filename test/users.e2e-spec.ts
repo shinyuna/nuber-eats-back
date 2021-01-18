@@ -5,6 +5,7 @@ import { getConnection, Repository } from 'typeorm';
 import * as request from 'supertest';
 import { User } from 'src/users/entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { Verification } from 'src/users/entities/verification.entity';
 
 jest.mock('got', () => {
   return {
@@ -15,7 +16,7 @@ jest.mock('got', () => {
 const GRAPHQL_ENDPOINT = '/graphql';
 
 const testUser = {
-  email: 'yuna4573@naver.com',
+  email: 'yoong@old.com',
   password: '12345',
 };
 
@@ -23,6 +24,7 @@ describe('AppController (e2e)', () => {
   let app: INestApplication;
   let usersRepository: Repository<User>;
   let jwtToken: string;
+  let verificationRepository: Repository<Verification>;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,6 +32,7 @@ describe('AppController (e2e)', () => {
     }).compile();
     app = module.createNestApplication();
     usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    verificationRepository = module.get<Repository<Verification>>(getRepositoryToken(Verification));
     await app.init();
   });
 
@@ -256,6 +259,117 @@ describe('AppController (e2e)', () => {
     });
   });
 
-  it.todo('vertifyEmail');
-  it.todo('editProfile');
+  describe('editProfile', () => {
+    const NEW_EMAIL = 'yoong@new.com';
+    it('should change email', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', jwtToken)
+        .send({
+          query: `mutation{
+          editProfile(input: {
+            email: "${NEW_EMAIL}",
+          }) {
+            ok
+            error
+          }
+        }`,
+        })
+        .expect(200)
+        .expect(res => {
+          const {
+            body: {
+              data: {
+                editProfile: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+        });
+    });
+    it('should have new email', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .set('X-JWT', jwtToken)
+        .send({
+          query: `{
+            authorization {
+              email
+            }
+          }`,
+        })
+        .expect(200)
+        .expect(res => {
+          const {
+            body: {
+              data: {
+                authorization: { email },
+              },
+            },
+          } = res;
+          expect(email).toBe(NEW_EMAIL);
+        });
+    });
+  });
+
+  describe('verifyEmail', () => {
+    let verificationCode: string;
+    beforeAll(async () => {
+      const [verification] = await verificationRepository.find();
+      verificationCode = verification.code;
+    });
+    it('should verify email', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `mutation {
+          verifyEmail(input: {
+            code: "${verificationCode}"
+          }) {
+            ok
+            error
+          }
+        }`,
+        })
+        .expect(200)
+        .expect(res => {
+          const {
+            body: {
+              data: {
+                verifyEmail: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(true);
+          expect(error).toBe(null);
+        });
+    });
+    it('should fail on wrong verification code', () => {
+      return request(app.getHttpServer())
+        .post(GRAPHQL_ENDPOINT)
+        .send({
+          query: `mutation {
+          verifyEmail(input: {
+            code: "12303842398324"
+          }) {
+            ok
+            error
+          }
+        }`,
+        })
+        .expect(200)
+        .expect(res => {
+          const {
+            body: {
+              data: {
+                verifyEmail: { ok, error },
+              },
+            },
+          } = res;
+          expect(ok).toBe(false);
+          expect(error).toBe('Verification not foune.');
+        });
+    });
+  });
 });
