@@ -13,14 +13,19 @@ export class RestaurantService {
     @InjectRepository(Category) private readonly categories: Repository<Category>,
   ) {}
 
-  async createRestaurant(owner: User, createRestaurantInput: CreateRestaurantInput): Promise<CreateRestaurantOutput> {
+  async createRestaurant(
+    owner: User,
+    createRestaurantInput: CreateRestaurantInput,
+  ): Promise<CreateRestaurantOutput> {
     try {
       const newRestaurant = this.restaurants.create(createRestaurantInput);
       const categoryName = createRestaurantInput.categoryName.trim().toLowerCase();
       const categorySlug = categoryName.replace(/ /g, '-');
-      const category = await this.categories.findOne({ slug: categorySlug });
+      let category = await this.categories.findOne({ slug: categorySlug });
       if (!category) {
-        this.categories.save(this.categories.create({ name: categoryName, slug: categorySlug }));
+        category = await this.categories.save(
+          this.categories.create({ name: categoryName, slug: categorySlug }),
+        );
       }
       newRestaurant.owner = owner;
       newRestaurant.category = category;
