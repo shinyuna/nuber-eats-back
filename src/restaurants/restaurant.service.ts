@@ -1,29 +1,33 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
-import { CreateRestaurantDto } from './dto/createRestaurant.dto';
-import { UpdateRestaurantDto } from './dto/updateRestaurant.dto';
+import { CreateRestaurantInput, CreateRestaurantOutput } from './dto/createRestaurant.dto';
+import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 
 @Injectable()
 export class RestaurantService {
-  constructor(@InjectRepository(Restaurant) private readonly restaurants: Repository<Restaurant>) {}
+  constructor(
+    @InjectRepository(Restaurant) private readonly restaurants: Repository<Restaurant>,
+    @InjectRepository(Category) private readonly categories: Repository<Category>,
+  ) {}
 
-  getAll(): Promise<Restaurant[]> {
-    return this.restaurants.find();
-  }
-
-  createRestaurant(ReestaurantData: CreateRestaurantDto): Promise<Restaurant> {
-    const newRestaurant = this.restaurants.create(ReestaurantData);
-    return this.restaurants.save(newRestaurant);
-  }
-
-  updateRestaurant({ id, data }: UpdateRestaurantDto) {
-    return this.restaurants.update(id, { ...data });
+  async createRestaurant(owner: User, createRestaurantInput: CreateRestaurantInput): Promise<CreateRestaurantOutput> {
+    try {
+      const newRestaurant = this.restaurants.create(createRestaurantInput);
+      const categoryName = createRestaurantInput.categoryName.trim().toLowerCase();
+      const categorySlug = categoryName.replace(/ /g, '-');
+      const category = await this.categories.findOne({ slug: categorySlug });
+      if (!category) {
+        this.categories.save(this.categories.create({ name: categoryName, slug: categorySlug }));
+      }
+      newRestaurant.owner = owner;
+      newRestaurant.category = category;
+      this.restaurants.save(newRestaurant);
+      return { ok: true };
+    } catch (error) {
+      return { ok: false, error: 'Could not create restaurant' };
+    }
   }
 }
-
-/* 
-create: javascript에서만 데이터를 생성?존재?하고 DB에 저장이 되지 않음
-save: DB에 데이터를 저장
-*/
