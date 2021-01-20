@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { JwtService } from 'src/jwt/jwt.service';
 import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User, UserRole } from './entities/user.entity';
 import { Verification } from './entities/verification.entity';
 import { UsersService } from './users.service';
 
@@ -68,7 +68,7 @@ describe('UserService', () => {
     const createAccountArgs = {
       email: 'test@email.com',
       password: 'test.password',
-      role: 0,
+      role: UserRole.Owner,
     };
 
     it('should fail if user exists', async () => {
@@ -104,7 +104,10 @@ describe('UserService', () => {
       expect(verificationRepository.save).toHaveBeenCalledWith({ user: createAccountArgs });
 
       expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
-      expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(expect.any(String), expect.any(String));
+      expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(String),
+      );
 
       expect(result).toEqual({ ok: true });
     });
@@ -245,7 +248,10 @@ describe('UserService', () => {
       const result = await service.verifyEmail('');
 
       expect(verificationRepository.findOne).toHaveBeenCalledTimes(1);
-      expect(verificationRepository.findOne).toHaveBeenCalledWith(expect.any(Object), expect.any(Object));
+      expect(verificationRepository.findOne).toHaveBeenCalledWith(
+        expect.any(Object),
+        expect.any(Object),
+      );
 
       expect(usersRepository.save).toHaveBeenCalledTimes(1);
       expect(usersRepository.save).toHaveBeenCalledWith({ verify: true });
