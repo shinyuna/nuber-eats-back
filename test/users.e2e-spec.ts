@@ -41,8 +41,10 @@ describe('AppController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await getConnection().dropDatabase();
-    app.close();
+    if (process.env.NODE_ENV === 'test') {
+      await getConnection().dropDatabase();
+      app.close();
+    }
   });
 
   describe('createAccount', () => {
