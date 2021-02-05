@@ -35,6 +35,21 @@ export class RestaurantService {
 
   async editRestaurant(owner: User, editRestaurantInput: EditRestaurantInput): Promise<EditProfileOutput> {
     try {
+      const restaurant = await this.restaurants.findOne(editRestaurantInput.restaurantId, {
+        loadRelationIds: true,
+      });
+      if (!restaurant) {
+        return {
+          ok: false,
+          error: 'Restaurant not found.',
+        };
+      }
+      if (owner.id !== restaurant.ownerId) {
+        return {
+          ok: false,
+          error: "You can't edit a restaurant that you don't own.",
+        };
+      }
     } catch (error) {
       return {
         ok: false,
