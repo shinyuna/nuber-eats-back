@@ -14,15 +14,18 @@ export class RestaurantResolver {
   @Mutation(returns => CreateRestaurantOutput)
   @Role(['Owner'])
   async createRestaurant(
-    @AuthUser() authUser: User,
+    @AuthUser() owner: User,
     @Args('input') params: CreateRestaurantInput,
   ): Promise<CreateRestaurantOutput> {
-    return this.restaurantService.createRestaurant(authUser, params);
+    return this.restaurantService.createRestaurant(owner, params);
   }
 
   @Mutation(returns => EditRestaurantOutput)
   @Role(['Owner'])
-  async editRestaurant(@Args('input') params: EditRestaurantInput): Promise<EditRestaurantOutput> {
-    return { ok: true };
+  async editRestaurant(
+    @AuthUser() owner: User,
+    @Args('input') params: EditRestaurantInput,
+  ): Promise<EditRestaurantOutput> {
+    return this.restaurantService.editRestaurant(owner, params);
   }
 }
