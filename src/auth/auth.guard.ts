@@ -9,7 +9,7 @@ export class AuthGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
   canActivate(context: ExecutionContext) {
     const roles = this.reflector.get<AllowedRoles>('roles', context.getHandler());
-    // metadata가 없는 public한 애들
+    // metadata가 없는 public힌 애들
     if (!roles) {
       return true;
     }
@@ -23,7 +23,6 @@ export class AuthGuard implements CanActivate {
     if (roles.includes('Any')) {
       return true;
     }
-    // user data에서 온 role이 metadata role에 포함 되어 있는지의 여부
     return roles.includes(user.role);
   }
 }
