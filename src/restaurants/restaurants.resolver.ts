@@ -42,6 +42,13 @@ export class RestaurantResolver {
   ): Promise<DeleteRestaurantOutput> {
     return this.restaurantService.deleteRestaurant(owner, params);
   }
+
+  @Query(returns => RestaurantsOutput)
+  allRestaurants(@Args('input') params: RestaurantsInput): Promise<RestaurantsOutput> {
+    return this.restaurantService.allRestaurants(params);
+  }
+}
+
 @Resolver(of => Category)
 export class CategoryResolver {
   constructor(private readonly categoryService: CategoryService) {}

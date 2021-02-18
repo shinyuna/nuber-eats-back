@@ -98,6 +98,27 @@ export class RestaurantService {
     }
   }
 
+  async allRestaurants({ page, limit }: RestaurantsInput): Promise<RestaurantsOutput> {
+    try {
+      const [restaurants, totalResults] = await this.restaurants.findAndCount({
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+      return {
+        ok: true,
+        result: restaurants,
+        totalCount: totalResults,
+        totalPages: Math.ceil(totalResults / limit),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Could not load restaurants.',
+      };
+    }
+  }
+}
+
 @Injectable()
 export class CategoryService {
   constructor(
