@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EditProfileOutput } from 'src/users/dtos/edit-profile.dto';
 import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
+import { AllCategoriesOutput } from './dto/all-categories.dto';
+import { CategorySlugInput, CategorySlugOutput } from './dto/find-category-by-slug.dto';
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dto/create-restaurant.dto';
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dto/delete-restaurant.dto';
 import { EditRestaurantInput } from './dto/edit-restaurant.dto';
+import { RestaurantsInput, RestaurantsOutput } from './dto/all-restaurants.dto';
 import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repositories';
@@ -91,6 +94,61 @@ export class RestaurantService {
       return {
         ok: false,
         error: 'Could not delete restaurant.',
+      };
+    }
+  }
+
+@Injectable()
+export class CategoryService {
+  constructor(
+    @InjectRepository(Restaurant) private readonly restaurants: Repository<Restaurant>,
+    private readonly categories: CategoryRepository,
+  ) {}
+
+  async allCategories(): Promise<AllCategoriesOutput> {
+    try {
+      const categories = await this.categories.find();
+      return {
+        ok: true,
+        categories,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Could not load categories.',
+      };
+    }
+  }
+
+  countRestaurants(category: Category) {
+    return this.restaurants.count({ category });
+  }
+
+  async findCategoryBySlug({ slug, page, limit }: CategorySlugInput): Promise<CategorySlugOutput> {
+    try {
+      const category = await this.categories.findOne({ slug });
+      if (!category) {
+        return {
+          ok: false,
+          error: 'Category not found.',
+        };
+      }
+      const restaurants = await this.restaurants.find({
+        where: { category },
+        take: limit,
+        skip: (page - 1) * limit,
+      });
+      const totalResult = await this.countRestaurants(category);
+      return {
+        ok: true,
+        restaurants,
+        category,
+        totalPages: Math.ceil(totalResult / limit),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Could not find category.',
       };
     }
   }
