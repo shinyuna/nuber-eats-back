@@ -12,6 +12,7 @@ import { RestaurantsInput, RestaurantsOutput } from './dto/all-restaurants.dto';
 import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repositories';
+import { RestaurantInput, RestaurantOutput } from './dto/restaurant.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -114,6 +115,27 @@ export class RestaurantService {
       return {
         ok: false,
         error: 'Could not load restaurants.',
+      };
+    }
+  }
+
+  async findRestaurantById({ restaurantId }: RestaurantInput): Promise<RestaurantOutput> {
+    try {
+      const restaurant = await this.restaurants.findOne(restaurantId);
+      if (!restaurant) {
+        return {
+          ok: false,
+          error: 'Restaurant not found.',
+        };
+      }
+      return {
+        ok: true,
+        restaurant,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Could not load restaurant.',
       };
     }
   }
