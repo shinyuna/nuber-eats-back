@@ -13,6 +13,7 @@ import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repositories';
 import { RestaurantInput, RestaurantOutput } from './dto/restaurant.dto';
+import { SearchRestaurantInput, SearchRestaurantOutput } from './dto/search-restaurant.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -136,6 +137,29 @@ export class RestaurantService {
       return {
         ok: false,
         error: 'Could not load restaurant.',
+      };
+    }
+  }
+
+  async searchRestaurantByName({ query, page, limit }: SearchRestaurantInput): Promise<SearchRestaurantOutput> {
+    try {
+      const [restaurants, totalResult] = await this.restaurants.findAndCount({
+        where: {
+          name: Raw(name => `${name} ILIKE '%${query}%'`),
+        },
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+      return {
+        ok: true,
+        restaurants,
+        totalCount: totalResult,
+        totalPages: Math.ceil(totalResult / limit),
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Could not search for restaurant.',
       };
     }
   }
