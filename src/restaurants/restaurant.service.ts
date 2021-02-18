@@ -2,9 +2,9 @@ import { Injectable, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EditProfileOutput } from 'src/users/dtos/edit-profile.dto';
 import { User } from 'src/users/entities/user.entity';
-import { Repository } from 'typeorm';
+import { ILike, Raw, Repository } from 'typeorm';
 import { AllCategoriesOutput } from './dto/all-categories.dto';
-import { CategorySlugInput, CategorySlugOutput } from './dto/find-category-by-slug.dto';
+import { CategoryBySlugInput, CategoryBySlugOutput } from './dto/category-by-slug.dto';
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dto/create-restaurant.dto';
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dto/delete-restaurant.dto';
 import { EditRestaurantInput } from './dto/edit-restaurant.dto';
@@ -145,7 +145,7 @@ export class CategoryService {
     return this.restaurants.count({ category });
   }
 
-  async findCategoryBySlug({ slug, page, limit }: CategorySlugInput): Promise<CategorySlugOutput> {
+  async findCategoryBySlug({ slug, page, limit }: CategoryBySlugInput): Promise<CategoryBySlugOutput> {
     try {
       const category = await this.categories.findOne({ slug });
       if (!category) {
