@@ -13,6 +13,8 @@ import { CategoryBySlugInput, CategoryBySlugOutput } from './dto/category';
 import { RestaurantsInput, RestaurantsOutput } from './dto/all-restaurants.dto';
 import { RestaurantInput, RestaurantOutput } from './dto/restaurant.dto';
 import { SearchRestaurantInput, SearchRestaurantOutput } from './dto/search-restaurant.dto';
+import { Dish } from './entities/dish.entity';
+import { CreateDishInput, CreateDishOutput } from './dto/create-dish.dto';
 
 @Resolver(of => Restaurant)
 export class RestaurantResolver {
@@ -80,5 +82,14 @@ export class CategoryResolver {
     return this.categoryService.findRestaurantByCategory(categoryInput);
   }
 }
+
+@Resolver(of => Dish)
+export class DishResolver {
+  constructor(private readonly restaurantService: RestaurantService) {}
+
+  @Mutation(returns => CreateDishOutput)
+  @Role(['Owner'])
+  async createDish(@AuthUser() owner: User, @Args('input') params: CreateDishInput): Promise<CreateDishOutput> {
+    return this.restaurantService.createDish(owner, params);
   }
 }
