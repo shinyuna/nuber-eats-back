@@ -9,7 +9,7 @@ import { EditRestaurantInput, EditRestaurantOutput } from './dto/edit-restaurant
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dto/delete-restaurant.dto';
 import { Category } from './entities/category.entity';
 import { AllCategoriesOutput } from './dto/all-categories.dto';
-import { CategoryBySlugInput, CategoryBySlugOutput } from './dto/category-by-slug.dto';
+import { CategoryBySlugInput, CategoryBySlugOutput } from './dto/category';
 import { RestaurantsInput, RestaurantsOutput } from './dto/all-restaurants.dto';
 import { RestaurantInput, RestaurantOutput } from './dto/restaurant.dto';
 import { SearchRestaurantInput, SearchRestaurantOutput } from './dto/search-restaurant.dto';
@@ -76,7 +76,9 @@ export class CategoryResolver {
   }
 
   @Query(returns => CategoryBySlugOutput)
-  async findCategoryBySlug(@Args('input') categoryInput: CategoryBySlugInput): Promise<CategoryBySlugOutput> {
-    return this.categoryService.findCategoryBySlug(categoryInput);
+  async findRestaurantByCategory(@Args('input') categoryInput: CategoryBySlugInput): Promise<CategoryBySlugOutput> {
+    return this.categoryService.findRestaurantByCategory(categoryInput);
+  }
+}
   }
 }
