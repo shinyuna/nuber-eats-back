@@ -1,4 +1,4 @@
-import { Injectable, Query } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EditProfileOutput } from 'src/users/dtos/edit-profile.dto';
 import { User } from 'src/users/entities/user.entity';
@@ -16,6 +16,7 @@ import { RestaurantInput, RestaurantOutput } from './dto/restaurant.dto';
 import { SearchRestaurantInput, SearchRestaurantOutput } from './dto/search-restaurant.dto';
 import { CreateDishInput, CreateDishOutput } from './dto/create-dish.dto';
 import { Dish } from './entities/dish.entity';
+import { EditDishInput, EditDishOutput } from './dto/edit-dish.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -25,16 +26,32 @@ export class RestaurantService {
     private readonly categories: CategoryRepository,
   ) {}
 
-  async checkCondition(restaurantId: number, ownerId: number): Promise<{ err?: string; restaurant?: Restaurant }> {
+  async restaurantCheckCondition(
+    restaurantId: number,
+    ownerId: number,
+  ): Promise<{ err?: string; restaurant?: Restaurant }> {
     const restaurant = await this.restaurants.findOne(restaurantId);
     if (!restaurant) {
       return { err: 'Restaurant not found.' };
     }
     if (ownerId != restaurant.ownerId) {
-      return { err: "You can't edit a restaurant that you don't own." };
+      return { err: "You can't do that you don't own." };
     }
     return {
       restaurant,
+    };
+  }
+
+  async dishCheckCondition(dishId: number, ownerId: number): Promise<{ err?: string; dish?: Dish }> {
+    const dish = await this.dishes.findOne(dishId, { relations: ['restaurant'] });
+    if (!dish) {
+      return { err: 'Dish not found.' };
+    }
+    if (ownerId != dish.restaurant.ownerId) {
+      return { err: "You can't do that you don't own." };
+    }
+    return {
+      dish,
     };
   }
 
@@ -180,9 +197,14 @@ export class RestaurantService {
     }
   }
 
+  /** Dish API
+   * createDish
+   * editDish
+   * DeleteDish
+   */
   async createDish(owner: User, createDishInput: CreateDishInput): Promise<CreateDishOutput> {
     try {
-      const { err, restaurant } = await this.checkCondition(createDishInput.restaurantId, owner.id);
+      const { err, restaurant } = await this.restaurantCheckCondition(createDishInput.restaurantId, owner.id);
       if (err) {
         return {
           ok: false,
@@ -200,6 +222,34 @@ export class RestaurantService {
       };
     }
   }
+
+  async editDish(owner: User, editDishInput: EditDishInput): Promise<EditDishOutput> {
+    try {
+      const { err } = await this.dishCheckCondition(editDishInput.dishId, owner.id);
+      if (err) {
+        return {
+          ok: false,
+          error: err,
+        };
+      }
+      await this.dishes.save([
+        {
+          id: editDishInput.dishId,
+          ...editDishInput,
+        },
+      ]);
+      return {
+        ok: true,
+        error: null,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Could not edit dish.',
+      };
+    }
+  }
+
 }
 
 @Injectable()

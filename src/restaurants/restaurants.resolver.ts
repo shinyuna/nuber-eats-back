@@ -15,6 +15,7 @@ import { RestaurantInput, RestaurantOutput } from './dto/restaurant.dto';
 import { SearchRestaurantInput, SearchRestaurantOutput } from './dto/search-restaurant.dto';
 import { Dish } from './entities/dish.entity';
 import { CreateDishInput, CreateDishOutput } from './dto/create-dish.dto';
+import { EditDishInput, EditDishOutput } from './dto/edit-dish.dto';
 
 @Resolver(of => Restaurant)
 export class RestaurantResolver {
@@ -91,5 +92,11 @@ export class DishResolver {
   @Role(['Owner'])
   async createDish(@AuthUser() owner: User, @Args('input') params: CreateDishInput): Promise<CreateDishOutput> {
     return this.restaurantService.createDish(owner, params);
+  }
+
+  @Mutation(returns => EditDishOutput)
+  @Role(['Owner'])
+  async editDish(@AuthUser() owner: User, @Args('input') params: EditDishInput): Promise<EditDishOutput> {
+    return this.restaurantService.editDish(owner, params);
   }
 }
