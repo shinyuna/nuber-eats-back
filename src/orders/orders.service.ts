@@ -123,7 +123,10 @@ export class OrderService {
     try {
       const order = await this.orders.findOne(orderId, { relations: ['restaurant'] });
       if (!order) return { ok: false, error: 'Order not found.' };
-      if (order.customerId !== user.id && order.driverId !== user.id && order.restaurant.ownerId !== user.id) {
+      const checkCustomer = user.role === UserRole.Client && order.customerId !== user.id;
+      const checkDriver = user.role === UserRole.Delivery && order.driverId !== user.id;
+      const checkOwner = user.role === UserRole.Owner && order.restaurant.ownerId !== user.id;
+      if (checkCustomer || checkDriver || checkOwner) {
         return { ok: false, error: "You can't not see that." };
       }
       return {
