@@ -194,10 +194,10 @@ describe('AppController (e2e)', () => {
     });
   });
 
-  describe('authorization', () => {
+  describe('me', () => {
     it('should find my profile', () => {
       return privateTest(`{
-        authorization {
+        me {
             email
           }
         }`)
@@ -206,7 +206,7 @@ describe('AppController (e2e)', () => {
           const {
             body: {
               data: {
-                authorization: { email },
+                me: { email },
               },
             },
           } = res;
@@ -215,7 +215,7 @@ describe('AppController (e2e)', () => {
     });
     it('should not allow logged out user', () => {
       return publicTest(`{
-        authorization {
+        me {
             email
           }
         }`)
@@ -256,7 +256,7 @@ describe('AppController (e2e)', () => {
     });
     it('should have new email', () => {
       return privateTest(`{
-        authorization {
+        me {
             email
           }
         }`)
@@ -265,7 +265,7 @@ describe('AppController (e2e)', () => {
           const {
             body: {
               data: {
-                authorization: { email },
+                me: { email },
               },
             },
           } = res;

@@ -16,9 +16,7 @@ export class UsersResolver {
   constructor(private readonly userService: UsersService) {}
 
   @Mutation(returns => CreateAccountOutput)
-  async createAccount(
-    @Args('input') createAccountInput: CreateAccountInput,
-  ): Promise<CreateAccountOutput> {
+  async createAccount(@Args('input') createAccountInput: CreateAccountInput): Promise<CreateAccountOutput> {
     return this.userService.createAccount(createAccountInput);
   }
 
@@ -30,7 +28,7 @@ export class UsersResolver {
   @Query(returns => User)
   @UseGuards(AuthGuard)
   @Role(['Any'])
-  authorization(@AuthUser() authUser: User) {
+  me(@AuthUser() authUser: User) {
     return authUser;
   }
 
