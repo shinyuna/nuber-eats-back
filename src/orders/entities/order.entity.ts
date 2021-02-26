@@ -39,8 +39,8 @@ export class Order extends CoreEntity {
   restaurant?: Restaurant;
 
   @Field(type => [OrderItem])
-  @ManyToMany(type => OrderItem) // 오더는 여러개의 디시를 갖을 수 있도 디쉬 또한 같음
-  @JoinTable() // 소유하고 있는 쪽에 선언해주면 된다. (디시는 자신이 어떤 오더에 포함되어 있는지 알 수 없음 하지만 오더는 얻떤 디시를 고객이 선택했는지 알 수 있음. )
+  @ManyToMany(type => OrderItem, { onDelete: 'CASCADE' }) // 오더는 여러개의 디시를 갖을 수 있도 디쉬 또한 같음
+  @JoinTable({ name: 'order_detail' }) // 소유하고 있는 쪽에 선언해주면 된다. (디시는 자신이 어떤 오더에 포함되어 있는지 알 수 없음 하지만 오더는 얻떤 디시를 고객이 선택했는지 알 수 있음. )
   items: OrderItem[];
 
   @Column({ nullable: true })

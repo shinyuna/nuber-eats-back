@@ -61,6 +61,6 @@ export class Dish extends CoreEntity {
   restaurantId: number;
 
   @Field(type => [DishOption], { nullable: true })
-  @Column({ type: 'json', nullable: true })
+  @Column({ type: 'json', nullable: true }) // 주인장이 option을 지우거나 변경하기 쉽게 json을 사용.
   options?: DishOption[];
 }

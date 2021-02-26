@@ -20,15 +20,25 @@ export class OrderService {
     @InjectRepository(Dish) private readonly dishes: Repository<Dish>,
   ) {}
 
+  async checkOrderAndUser(orderId: number, user: User): Promise<{ error?: string; order?: Order }> {
+    const order = await this.orders.findOne(orderId, { relations: ['restaurant'] });
+    if (!order) {
+      return { error: 'Order not found.' };
+    }
+    const checkCustomer = user.role === UserRole.Client && order.customerId !== user.id;
+    const checkDriver = user.role === UserRole.Delivery && order.driverId !== user.id;
+    const checkOwner = user.role === UserRole.Owner && order.restaurant.ownerId !== user.id;
+    if (checkCustomer || checkDriver || checkOwner) {
+      return { error: "You can't not see that." };
+    }
+    return { order };
+  }
+
   async createOrder(customer: User, { restaurantId, items }: CreateOrderInput): Promise<CreateOrderOutput> {
     try {
       const restaurant = await this.restaurants.findOne(restaurantId);
-      if (!restaurant) {
-        return {
-          ok: false,
-          error: 'Restaurant not found.',
-        };
-      }
+      if (!restaurant) return { ok: false, error: 'Restaurant not found.' };
+
       let orderFinalPrice = 0;
       const orderItems: OrderItem[] = [];
       for (const item of items) {
@@ -122,13 +132,9 @@ export class OrderService {
 
   async getOrder(user: User, { id: orderId }: GetOrderInput): Promise<GetOrderOutput> {
     try {
-      const order = await this.orders.findOne(orderId, { relations: ['restaurant'] });
-      if (!order) return { ok: false, error: 'Order not found.' };
-      const checkCustomer = user.role === UserRole.Client && order.customerId !== user.id;
-      const checkDriver = user.role === UserRole.Delivery && order.driverId !== user.id;
-      const checkOwner = user.role === UserRole.Owner && order.restaurant.ownerId !== user.id;
-      if (checkCustomer || checkDriver || checkOwner) {
-        return { ok: false, error: "You can't not see that." };
+      const { error, order } = await this.checkOrderAndUser(orderId, user);
+      if (error) {
+        return { ok: false, error };
       }
       return {
         ok: true,
@@ -142,18 +148,13 @@ export class OrderService {
     }
   }
 
-  async updateOrderStatus(user: User, { id: OrderId, status }: EditOrderInput): Promise<EditOrderOutput> {
+  async updateOrderStatus(user: User, { id: orderId, status }: EditOrderInput): Promise<EditOrderOutput> {
     try {
-      const order = await this.orders.findOne(OrderId, { relations: ['restaurant'] });
-      if (!order) {
-        return { ok: false, error: 'Order not found.' };
+      const { error } = await this.checkOrderAndUser(orderId, user);
+      if (error) {
+        return { ok: false, error };
       }
-      const checkCustomer = user.role === UserRole.Client && order.customerId !== user.id;
-      const checkDriver = user.role === UserRole.Delivery && order.driverId !== user.id;
-      const checkOwner = user.role === UserRole.Owner && order.restaurant.ownerId !== user.id;
-      if (checkCustomer || checkDriver || checkOwner) {
-        return { ok: false, error: "You can't not see that." };
-      }
+
       let canEdit = true;
       if (user.role === UserRole.Client) {
         canEdit = false;
@@ -174,16 +175,14 @@ export class OrderService {
           error: "You can't not do that.",
         };
       }
+
       await this.orders.save([
         {
-          id: OrderId,
+          id: orderId,
           status,
         },
       ]);
-      return {
-        ok: true,
-        status,
-      };
+      return { ok: true, status };
     } catch (error) {
       return {
         ok: false,

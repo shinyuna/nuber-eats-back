@@ -15,6 +15,7 @@ export class OrderResolver {
   constructor(private readonly OrdersService: OrderService) {}
 
   @Mutation(returns => CreateOrderOutput)
+  @Role(['Client'])
   async createOrder(@AuthUser() customer: User, @Args('input') params: CreateOrderInput): Promise<CreateDishOutput> {
     return this.OrdersService.createOrder(customer, params);
   }
@@ -34,6 +35,7 @@ export class OrderResolver {
   @Mutation(returns => EditOrderOutput)
   @Role(['Any'])
   async updateOrderStatus(@AuthUser() user: User, @Args('input') params: EditOrderInput): Promise<EditOrderOutput> {
-    return;
+    return this.OrdersService.updateOrderStatus(user, params);
+  }
   }
 }
