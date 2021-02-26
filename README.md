@@ -2,15 +2,6 @@
 
 The Backend of Uber Eats Clone
 
-## User Model:
-
-- id
-- createdAt
-- updatedAt
-- email
-- password
-- role(client|owner|delivery)
-
 ## User API:
 
 - Create Account
@@ -18,13 +9,6 @@ The Backend of Uber Eats Clone
 - See Profile
 - Edit Profile
 - Verify Email
-
-## Restaurant Model
-
-- name
-- category
-- address
-- coverImage
 
 ## Restaurant API
 
@@ -35,3 +19,11 @@ The Backend of Uber Eats Clone
 - Create Dish
 - Edit Dish
 - Delete Dish
+
+## Order API
+
+- Create Order
+- get Orders
+- get Order (user)
+- Edit Order Status
+- Orders Subscription (user)
