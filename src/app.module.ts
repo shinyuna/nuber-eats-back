@@ -17,6 +17,7 @@ import { Dish } from './restaurants/entities/dish.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -48,7 +49,14 @@ import { OrderItem } from './orders/entities/order-item.entity';
       logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
       entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem],
     }),
-    GraphQLModule.forRoot({ autoSchemaFile: true, context: ({ req }) => ({ user: req['user'] }) }),
+    GraphQLModule.forRoot({
+      installSubscriptionHandlers: true,
+      autoSchemaFile: true,
+      context: ({ req, connection }) => {
+        const TOKEN_KET = 'x-jwt';
+        return req ? { token: req.headers[TOKEN_KET] } : { token: connection.context[TOKEN_KET] };
+      },
+    }),
     JwtModule.forRoot({ privateKey: process.env.PRIVATE_KEY }),
     MailModule.forRoot({
       apiKey: process.env.MAILGUN_API_KEY,
@@ -60,15 +68,9 @@ import { OrderItem } from './orders/entities/order-item.entity';
     MailModule,
     RestaurantsModule,
     OrdersModule,
+    CommonModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleware).forRoutes({
-      path: '/graphql',
-      method: RequestMethod.ALL,
-    });
-  }
-}
+export class AppModule {}
