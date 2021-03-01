@@ -77,5 +77,9 @@ export class OrderResolver {
     return this.pubSub.asyncIterator(NEW_ORDER_UPDATE);
   }
 
+  @Mutation(returns => TakeOrderOutput)
+  @Role(['Delivery'])
+  async takeOrder(@AuthUser() driver: User, @Args('input') params: TakeOrderInput): Promise<TakeOrderOutput> {
+    return this.OrdersService.takeOrder(driver, params);
   }
 }

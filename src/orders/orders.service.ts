@@ -207,4 +207,39 @@ export class OrderService {
       };
     }
   }
+
+  async takeOrder(driver: User, { id: orderId }): Promise<TakeOrderOutput> {
+    try {
+      const order = await this.orders.findOne(orderId);
+      if (!order) {
+        return {
+          ok: false,
+          error: 'Order not found.',
+        };
+      }
+      if (order.driver) {
+        return {
+          ok: false,
+          error: 'This order already has a dirver.',
+        };
+      }
+      await this.orders.save({
+        id: orderId,
+        driver,
+      });
+      // 드라이버가 주문을 받으면 해당 주문 관련자(손님, 오너)에게 업데이트 알림
+      await this.pubSub.publish(NEW_ORDER_UPDATE, {
+        orderUpdates: { ...order, driver },
+      });
+      return {
+        ok: true,
+        orderId: order.id,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Could not drive order.',
+      };
+    }
+  }
 }
