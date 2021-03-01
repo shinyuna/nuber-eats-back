@@ -2,7 +2,11 @@
 
 The Backend of Uber Eats Clone
 
-## User API:
+## API Docs
+
+---
+
+### User API:
 
 - Create Account
 - Log In
@@ -10,7 +14,7 @@ The Backend of Uber Eats Clone
 - Edit Profile
 - Verify Email
 
-## Restaurant API
+### Restaurant API
 
 - See Categories
 - See Restaurant by Category (pagination)
@@ -20,10 +24,21 @@ The Backend of Uber Eats Clone
 - Edit Dish
 - Delete Dish
 
-## Order API
+### Order API
 
 - Create Order
-- get Orders
-- get Order (user)
+- Get Orders
+- Get Order (user)
 - Edit Order Status
 - Orders Subscription (user)
+  - Pending Order (s: newOrder) (t: createOrder(newOrder))
+  - Order Status (Customer, Dlivery, Owner) (s: orderUpdate) (t: editOrder(orderUpdate))
+  - Pending Pickup Order (Delivery) (s: orderUpdate) (t: editOrder(orderUpdate))
+
+## Use Tech Stack
+
+---
+
+- Nest JS
+- TypeORM
+- GraphQL
