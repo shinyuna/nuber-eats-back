@@ -35,6 +35,11 @@ The Backend of Uber Eats Clone
   - Order Status (Customer, Dlivery, Owner) (s: orderUpdate) (t: editOrder(orderUpdate))
   - Pending Pickup Order (Delivery) (s: orderUpdate) (t: editOrder(orderUpdate))
 
+### Payment API
+
+- Create Payment (owner)
+- Get Payments (owner)
+
 ## Use Tech Stack
 
 ---
