@@ -6,6 +6,7 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { IsBoolean, IsEnum, IsString } from 'class-validator';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { Order } from 'src/orders/entities/order.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 
 export enum UserRole {
   Client = 'Client',
@@ -45,6 +46,10 @@ export class User extends CoreEntity {
   @Field(type => [Order])
   @OneToMany(type => Order, order => order.customer) // 한 유저가 많은 오더를 갖을 수 있다.
   orders: Order[];
+
+  @Field(type => [Payment])
+  @OneToMany(type => Payment, payment => payment.user) // 한 유저가 많은 오더를 갖을 수 있다.
+  payments: Payment[];
 
   @Field(type => [Order])
   @OneToMany(type => Order, order => order.driver)
