@@ -30,7 +30,7 @@ The Backend of Uber Eats Clone
 - Get Orders
 - Get Order (user)
 - Edit Order Status
-- Orders Subscription (user)
+- Orders Subscription (WebSocket)
   - Pending Order (s: newOrder) (t: createOrder(newOrder))
   - Order Status (Customer, Dlivery, Owner) (s: orderUpdate) (t: editOrder(orderUpdate))
   - Pending Pickup Order (Delivery) (s: orderUpdate) (t: editOrder(orderUpdate))
