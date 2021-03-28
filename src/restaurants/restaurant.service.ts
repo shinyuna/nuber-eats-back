@@ -128,6 +128,7 @@ export class RestaurantService {
         order: {
           isPromoted: 'DESC',
         },
+        relations: ['category'],
       });
       return {
         ok: true,
