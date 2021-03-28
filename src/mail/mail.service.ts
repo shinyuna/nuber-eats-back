@@ -8,10 +8,11 @@ import { EmailVar, MailModuleOptions } from './mail.interfaces';
 export class MailService {
   constructor(@Inject(CONFIG_OPTIONS) private readonly options: MailModuleOptions) {}
 
-  async sendEmail(subject: string, template: string, emailVars: EmailVar[]): Promise<boolean> {
+  async sendEmail(to: string, subject: string, template: string, emailVars: EmailVar[]): Promise<boolean> {
     const form = new FormData();
-    form.append('from', `YoongFoo from Nuber Eats <mailgun@${this.options.domain}>`);
-    form.append('to', `yunadev01@gmail.com`);
+    form.append('from', `muk._.yoong from Nuber Eats <mailgun@${this.options.domain}>`);
+    form.append('to', `${this.options.domain}`);
+    form.append('to', `${to}`);
     form.append('subject', subject);
     form.append('template', template);
     emailVars.forEach(eVar => form.append(`v:${eVar.key}`, eVar.value));
@@ -29,8 +30,9 @@ export class MailService {
   }
 
   sendVerificationEmail(email: string, code: string) {
-    this.sendEmail('Verify Your Email', 'email_confirm_template', [
-      { key: 'username', value: email },
+    const username = email.slice(0, email.indexOf('@'));
+    this.sendEmail(email, 'Verify Your Email', 'email_confirm_template', [
+      { key: 'username', value: username },
       { key: 'code', value: code },
     ]);
   }

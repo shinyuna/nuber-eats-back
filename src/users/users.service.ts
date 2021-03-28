@@ -29,8 +29,7 @@ export class UsersService {
       }
       const user = await this.users.save(this.users.create({ email, password, role }));
       const { code } = await this.verification.save(this.verification.create({ user }));
-      const username = user.email.slice(0, user.email.indexOf('@'));
-      this.emailService.sendVerificationEmail(username, code);
+      this.emailService.sendVerificationEmail(email, code);
       return { ok: true };
     } catch (e) {
       return { ok: false, error: "Couldn't create account" };
@@ -78,8 +77,7 @@ export class UsersService {
         user.verify = false;
         this.verification.delete({ user: { id: user.id } });
         const { code } = await this.verification.save(this.verification.create({ user }));
-        const username = user.email.slice(0, user.email.indexOf('@'));
-        this.emailService.sendVerificationEmail(username, code);
+        this.emailService.sendVerificationEmail(email, code);
       }
       if (password) {
         user.password = password;
