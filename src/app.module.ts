@@ -37,7 +37,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         DB_NAME: Joi.string().required(),
         PRIVATE_KEY: Joi.string().required(),
         MAILGUN_API_KEY: Joi.string().required(),
-        MAILGUN_DOMAIN_NAMW: Joi.string().required(),
+        MAILGUN_DOMAIN_NAME: Joi.string().required(),
         MAILGUN_FROM_EMAIL: Joi.string().required(),
       }),
     }),
@@ -64,7 +64,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     JwtModule.forRoot({ privateKey: process.env.PRIVATE_KEY }),
     MailModule.forRoot({
       apiKey: process.env.MAILGUN_API_KEY,
-      domain: process.env.MAILGUN_DOMAIN_NAMW,
+      domain: process.env.MAILGUN_DOMAIN_NAME,
       fromEmail: process.env.MAILGUN_FROM_EMAIL,
     }),
     AuthModule,
