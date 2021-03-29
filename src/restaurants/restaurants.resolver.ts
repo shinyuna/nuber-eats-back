@@ -80,8 +80,8 @@ export class CategoryResolver {
   }
 
   @Query(returns => CategoryBySlugOutput)
-  async findRestaurantByCategory(@Args('input') categoryInput: CategoryBySlugInput): Promise<CategoryBySlugOutput> {
-    return this.categoryService.findRestaurantByCategory(categoryInput);
+  async searchRestaurantByCategory(@Args('input') categoryInput: CategoryBySlugInput): Promise<CategoryBySlugOutput> {
+    return this.categoryService.searchRestaurantByCategory(categoryInput);
   }
 }
 

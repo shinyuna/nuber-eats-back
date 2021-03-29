@@ -201,7 +201,7 @@ export class RestaurantService {
           error: err,
         };
       }
-      const dish = await this.dishes.save(this.dishes.create({ ...createDishInput, restaurant }));
+      await this.dishes.save(this.dishes.create({ ...createDishInput, restaurant }));
       return {
         ok: true,
       };
@@ -288,7 +288,7 @@ export class CategoryService {
     return this.restaurants.count({ category });
   }
 
-  async findRestaurantByCategory({ slug, page, limit }: CategoryBySlugInput): Promise<CategoryBySlugOutput> {
+  async searchRestaurantByCategory({ slug, page, limit }: CategoryBySlugInput): Promise<CategoryBySlugOutput> {
     try {
       const category = await this.categories.findOne({ slug });
       if (!category) {
