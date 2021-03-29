@@ -310,6 +310,7 @@ export class CategoryService {
         ok: true,
         restaurants,
         category,
+        totalCount: totalResult,
         totalPages: Math.ceil(totalResult / limit),
       };
     } catch (error) {
