@@ -18,7 +18,7 @@ import { CreateDishInput, CreateDishOutput } from './dto/create-dish.dto';
 import { Dish } from './entities/dish.entity';
 import { EditDishInput, EditDishOutput } from './dto/edit-dish.dto';
 import { DeleteDishInput, DeleteDishOutput } from './dto/delete-dish.dto';
-import { GetRestaurantByOwnerOutput } from './dto/get-restaurant-by-owner';
+import { GetRestaurantsByOwnerOutput } from './dto/get-restaurant-by-owner';
 
 @Injectable()
 export class RestaurantService {
@@ -144,7 +144,7 @@ export class RestaurantService {
     }
   }
 
-  async findRestaurantById({ restaurantId }: RestaurantInput): Promise<RestaurantOutput> {
+  async getRestaurant({ restaurantId }: RestaurantInput): Promise<RestaurantOutput> {
     try {
       const restaurant = await this.restaurants.findOne(restaurantId, { relations: ['menu'] });
       if (!restaurant) {
@@ -188,7 +188,7 @@ export class RestaurantService {
     }
   }
 
-  async getRestaurantByOwner(owner: User): Promise<GetRestaurantByOwnerOutput> {
+  async getRestaurantsByOwner(owner: User): Promise<GetRestaurantsByOwnerOutput> {
     try {
       const restaurants = await this.restaurants.find({ owner });
       return {
@@ -198,7 +198,22 @@ export class RestaurantService {
     } catch (error) {
       return {
         ok: false,
-        error: 'Could not load restaurant.',
+        error: 'Could not load restaurants.',
+      };
+    }
+  }
+
+  async getRestaurantByOwner(owner: User, { restaurantId: id }: RestaurantInput): Promise<RestaurantOutput> {
+    try {
+      const restaurant = await this.restaurants.findOne({ owner, id }, { relations: ['menu'] });
+      return {
+        ok: true,
+        restaurant,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Cloud not find restaurant.',
       };
     }
   }

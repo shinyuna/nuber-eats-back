@@ -17,7 +17,7 @@ import { Dish } from './entities/dish.entity';
 import { CreateDishInput, CreateDishOutput } from './dto/create-dish.dto';
 import { EditDishInput, EditDishOutput } from './dto/edit-dish.dto';
 import { DeleteDishInput, DeleteDishOutput } from './dto/delete-dish.dto';
-import { GetRestaurantByOwnerOutput } from './dto/get-restaurant-by-owner';
+import { GetRestaurantsByOwnerOutput } from './dto/get-restaurant-by-owner';
 
 @Resolver(of => Restaurant)
 export class RestaurantResolver {
@@ -56,8 +56,17 @@ export class RestaurantResolver {
   }
 
   @Query(returns => RestaurantOutput)
-  async findRestaurantById(@Args('input') params: RestaurantInput): Promise<RestaurantOutput> {
-    return this.restaurantService.findRestaurantById(params);
+  async getRestaurant(@Args('input') params: RestaurantInput): Promise<RestaurantOutput> {
+    return this.restaurantService.getRestaurant(params);
+  }
+
+  @Query(returns => RestaurantOutput)
+  @Role(['Owner'])
+  async getRestaurantByOwner(
+    @AuthUser() owner: User,
+    @Args('input') params: RestaurantInput,
+  ): Promise<RestaurantOutput> {
+    return this.restaurantService.getRestaurantByOwner(owner, params);
   }
 
   @Query(returns => FindRestaurantOutput)
@@ -65,10 +74,10 @@ export class RestaurantResolver {
     return this.restaurantService.findRestaurantByName(params);
   }
 
-  @Query(returns => GetRestaurantByOwnerOutput)
+  @Query(returns => GetRestaurantsByOwnerOutput)
   @Role(['Owner'])
-  async getRestaurantByOwner(@AuthUser() owner: User) {
-    return this.restaurantService.getRestaurantByOwner(owner);
+  async getRestaurantsByOwner(@AuthUser() owner: User) {
+    return this.restaurantService.getRestaurantsByOwner(owner);
   }
 }
 

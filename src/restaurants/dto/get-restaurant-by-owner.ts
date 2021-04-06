@@ -3,7 +3,7 @@ import { CoreOutput } from 'src/common/dtos/output.dto';
 import { Restaurant } from '../entities/restaurant.entity';
 
 @ObjectType()
-export class GetRestaurantByOwnerOutput extends CoreOutput {
+export class GetRestaurantsByOwnerOutput extends CoreOutput {
   @Field(type => [Restaurant])
   restaurants?: Restaurant[];
 }
