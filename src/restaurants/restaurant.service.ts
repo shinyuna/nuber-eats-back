@@ -18,6 +18,7 @@ import { CreateDishInput, CreateDishOutput } from './dto/create-dish.dto';
 import { Dish } from './entities/dish.entity';
 import { EditDishInput, EditDishOutput } from './dto/edit-dish.dto';
 import { DeleteDishInput, DeleteDishOutput } from './dto/delete-dish.dto';
+import { GetRestaurantByOwnerOutput } from './dto/get-restaurant-by-owner';
 
 @Injectable()
 export class RestaurantService {
@@ -183,6 +184,21 @@ export class RestaurantService {
       return {
         ok: false,
         error: 'Could not search for restaurant.',
+      };
+    }
+  }
+
+  async getRestaurantByOwner(owner: User): Promise<GetRestaurantByOwnerOutput> {
+    try {
+      const restaurants = await this.restaurants.find({ owner });
+      return {
+        ok: true,
+        restaurants,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Could not load restaurant.',
       };
     }
   }
