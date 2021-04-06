@@ -3,17 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EditProfileOutput } from 'src/users/dtos/edit-profile.dto';
 import { User } from 'src/users/entities/user.entity';
 import { Raw, Repository } from 'typeorm';
-import { AllCategoriesOutput } from './dto/all-categories.dto';
-import { CategoryBySlugInput, CategoryBySlugOutput } from './dto/category';
+import { GetCategoriesOutput } from './dto/get-categories.dto';
+import { FindRestaurantByCategoryInput, FindRestaurantByCategoryOutput } from './dto/find-restaurant-by-category';
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dto/create-restaurant.dto';
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dto/delete-restaurant.dto';
 import { EditRestaurantInput } from './dto/edit-restaurant.dto';
-import { RestaurantsInput, RestaurantsOutput } from './dto/all-restaurants.dto';
+import { GetRestaurantsInput, GetRestaurantsOutput } from './dto/get-restaurants.dto';
 import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repositories';
 import { RestaurantInput, RestaurantOutput } from './dto/restaurant.dto';
-import { SearchRestaurantInput, SearchRestaurantOutput } from './dto/search-restaurant.dto';
+import { FindRestaurantInput, FindRestaurantOutput } from './dto/find-restaurant-by-name.dto';
 import { CreateDishInput, CreateDishOutput } from './dto/create-dish.dto';
 import { Dish } from './entities/dish.entity';
 import { EditDishInput, EditDishOutput } from './dto/edit-dish.dto';
@@ -121,7 +121,7 @@ export class RestaurantService {
     }
   }
 
-  async allRestaurants({ page, limit }: RestaurantsInput): Promise<RestaurantsOutput> {
+  async getRestaurants({ page, limit }: GetRestaurantsInput): Promise<GetRestaurantsOutput> {
     try {
       const [restaurants, totalResults] = await this.restaurants.findAndCount({
         skip: (page - 1) * limit,
@@ -165,7 +165,7 @@ export class RestaurantService {
     }
   }
 
-  async searchRestaurantByName({ query, page, limit }: SearchRestaurantInput): Promise<SearchRestaurantOutput> {
+  async findRestaurantByName({ query, page, limit }: FindRestaurantInput): Promise<FindRestaurantOutput> {
     try {
       const [restaurants, totalResult] = await this.restaurants.findAndCount({
         where: {
@@ -285,7 +285,7 @@ export class CategoryService {
     private readonly categories: CategoryRepository,
   ) {}
 
-  async allCategories(): Promise<AllCategoriesOutput> {
+  async getCategories(): Promise<GetCategoriesOutput> {
     try {
       const categories = await this.categories.find();
       return {
@@ -304,7 +304,11 @@ export class CategoryService {
     return this.restaurants.count({ category });
   }
 
-  async searchRestaurantByCategory({ slug, page, limit }: CategoryBySlugInput): Promise<CategoryBySlugOutput> {
+  async findRestaurantByCategory({
+    slug,
+    page,
+    limit,
+  }: FindRestaurantByCategoryInput): Promise<FindRestaurantByCategoryOutput> {
     try {
       const category = await this.categories.findOne({ slug });
       if (!category) {
