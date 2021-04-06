@@ -1,16 +1,20 @@
-import { Controller, Inject, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Inject, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as AWS from 'aws-sdk';
 import { CONFIG_OPTIONS } from 'src/common/common.constants';
 import { UploadModuleConfig } from './uploads.interfaces';
 
+export class UploadFileDto {
+  type: string;
+  ownerId: string;
+}
 @Controller('uploads')
 export class UploadsController {
   constructor(@Inject(CONFIG_OPTIONS) private readonly config: UploadModuleConfig) {}
 
   @Post('')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file) {
+  async uploadFile(@UploadedFile() file, @Body() body: UploadFileDto) {
     AWS.config.update({
       credentials: {
         accessKeyId: this.config.accessKeyId,
@@ -18,7 +22,8 @@ export class UploadsController {
       },
     });
     try {
-      const objectName = `${Date.now() + file.originalname}`;
+      if (!body.ownerId && !body.type) return 'No params';
+      const objectName = `${body.ownerId}/${body.type}/${file.originalname}`;
       await new AWS.S3()
         .putObject({
           Body: file.buffer,
