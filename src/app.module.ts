@@ -21,6 +21,7 @@ import { CommonModule } from './common/common.module';
 import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entity';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -66,6 +67,11 @@ import { ScheduleModule } from '@nestjs/schedule';
       apiKey: process.env.MAILGUN_API_KEY,
       domain: process.env.MAILGUN_DOMAIN_NAME,
       fromEmail: process.env.MAILGUN_FROM_EMAIL,
+    }),
+    UploadsModule.forRoot({
+      accessKeyId: process.env.AWS_BUCKET_ACCESS_ID,
+      secretAccessKey: process.env.AWS_BUCKET_SECRET_ACCESS_KEY,
+      bucketName: process.env.AWS_BUCKET_NAME,
     }),
     AuthModule,
     UsersModule,
