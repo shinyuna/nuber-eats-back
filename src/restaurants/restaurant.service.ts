@@ -62,8 +62,8 @@ export class RestaurantService {
       const category = await this.categories.getOrCreate(createRestaurantInput.categoryName);
       newRestaurant.owner = owner;
       newRestaurant.category = category;
-      this.restaurants.save(newRestaurant);
-      return { ok: true };
+      await this.restaurants.save(newRestaurant);
+      return { ok: true, restaurantId: newRestaurant.id };
     } catch (error) {
       return { ok: false, error: 'Could not create restaurant' };
     }
