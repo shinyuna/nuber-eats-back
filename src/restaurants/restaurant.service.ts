@@ -3,22 +3,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EditProfileOutput } from 'src/users/dtos/edit-profile.dto';
 import { User } from 'src/users/entities/user.entity';
 import { Raw, Repository } from 'typeorm';
-import { GetCategoriesOutput } from './dto/get-categories.dto';
-import { FindRestaurantByCategoryInput, FindRestaurantByCategoryOutput } from './dto/find-restaurant-by-category';
-import { CreateRestaurantInput, CreateRestaurantOutput } from './dto/create-restaurant.dto';
-import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dto/delete-restaurant.dto';
-import { EditRestaurantInput } from './dto/edit-restaurant.dto';
-import { GetRestaurantsInput, GetRestaurantsOutput } from './dto/get-restaurants.dto';
+import { GetCategoriesOutput } from './dtos/get-categories.dto';
+import { FindRestaurantByCategoryInput, FindRestaurantByCategoryOutput } from './dtos/find-restaurant-by-category';
+import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/create-restaurant.dto';
+import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/delete-restaurant.dto';
+import { EditRestaurantInput } from './dtos/edit-restaurant.dto';
+import { GetRestaurantsInput, GetRestaurantsOutput } from './dtos/get-restaurants.dto';
 import { Category } from './entities/category.entity';
 import { Restaurant } from './entities/restaurant.entity';
 import { CategoryRepository } from './repositories/category.repositories';
-import { RestaurantInput, RestaurantOutput } from './dto/restaurant.dto';
-import { FindRestaurantInput, FindRestaurantOutput } from './dto/find-restaurant-by-name.dto';
-import { CreateDishInput, CreateDishOutput } from './dto/create-dish.dto';
+import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
+import { FindRestaurantInput, FindRestaurantOutput } from './dtos/find-restaurant-by-name.dto';
+import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
 import { Dish } from './entities/dish.entity';
-import { EditDishInput, EditDishOutput } from './dto/edit-dish.dto';
-import { DeleteDishInput, DeleteDishOutput } from './dto/delete-dish.dto';
-import { GetRestaurantsByOwnerOutput } from './dto/get-restaurant-by-owner';
+import { EditDishInput, EditDishOutput } from './dtos/edit-dish.dto';
+import { DeleteDishInput, DeleteDishOutput } from './dtos/delete-dish.dto';
+import { GetRestaurantsByOwnerOutput } from './dtos/get-restaurant-by-owner';
 
 @Injectable()
 export class RestaurantService {

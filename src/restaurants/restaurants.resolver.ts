@@ -1,23 +1,23 @@
 import { Resolver, Query, Args, Mutation, ResolveField, Int, Parent } from '@nestjs/graphql';
 import { Restaurant } from './entities/restaurant.entity';
-import { CreateRestaurantInput, CreateRestaurantOutput } from './dto/create-restaurant.dto';
+import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/create-restaurant.dto';
 import { CategoryService, RestaurantService } from './restaurant.service';
 import { AuthUser } from 'src/auth/auth-user.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { Role } from 'src/auth/role.decorator';
-import { EditRestaurantInput, EditRestaurantOutput } from './dto/edit-restaurant.dto';
-import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dto/delete-restaurant.dto';
+import { EditRestaurantInput, EditRestaurantOutput } from './dtos/edit-restaurant.dto';
+import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/delete-restaurant.dto';
 import { Category } from './entities/category.entity';
-import { GetCategoriesOutput } from './dto/get-categories.dto';
-import { FindRestaurantByCategoryInput, FindRestaurantByCategoryOutput } from './dto/find-restaurant-by-category';
-import { GetRestaurantsInput, GetRestaurantsOutput } from './dto/get-restaurants.dto';
-import { RestaurantInput, RestaurantOutput } from './dto/restaurant.dto';
-import { FindRestaurantInput, FindRestaurantOutput } from './dto/find-restaurant-by-name.dto';
+import { GetCategoriesOutput } from './dtos/get-categories.dto';
+import { FindRestaurantByCategoryInput, FindRestaurantByCategoryOutput } from './dtos/find-restaurant-by-category';
+import { GetRestaurantsInput, GetRestaurantsOutput } from './dtos/get-restaurants.dto';
+import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
+import { FindRestaurantInput, FindRestaurantOutput } from './dtos/find-restaurant-by-name.dto';
 import { Dish } from './entities/dish.entity';
-import { CreateDishInput, CreateDishOutput } from './dto/create-dish.dto';
-import { EditDishInput, EditDishOutput } from './dto/edit-dish.dto';
-import { DeleteDishInput, DeleteDishOutput } from './dto/delete-dish.dto';
-import { GetRestaurantsByOwnerOutput } from './dto/get-restaurant-by-owner';
+import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
+import { EditDishInput, EditDishOutput } from './dtos/edit-dish.dto';
+import { DeleteDishInput, DeleteDishOutput } from './dtos/delete-dish.dto';
+import { GetRestaurantsByOwnerOutput } from './dtos/get-restaurant-by-owner';
 
 @Resolver(of => Restaurant)
 export class RestaurantResolver {
