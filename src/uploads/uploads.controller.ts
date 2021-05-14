@@ -1,13 +1,11 @@
+import * as AWS from 'aws-sdk';
+
 import { Body, Controller, Inject, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import * as AWS from 'aws-sdk';
 import { CONFIG_OPTIONS } from 'src/common/common.constants';
 import { UploadModuleConfig } from './uploads.interfaces';
+import UploadFileDto from './dtos/upload-file.dto';
 
-export class UploadFileDto {
-  type: string;
-  ownerId: string;
-}
 @Controller('uploads')
 export class UploadsController {
   constructor(@Inject(CONFIG_OPTIONS) private readonly config: UploadModuleConfig) {}
