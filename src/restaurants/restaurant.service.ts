@@ -205,7 +205,7 @@ export class RestaurantService {
 
   async getRestaurantByOwner(owner: User, { restaurantId: id }: RestaurantInput): Promise<RestaurantOutput> {
     try {
-      const restaurant = await this.restaurants.findOne({ owner, id }, { relations: ['menu'] });
+      const restaurant = await this.restaurants.findOne({ owner, id }, { relations: ['menu', 'orders'] });
       return {
         ok: true,
         restaurant,
@@ -213,7 +213,7 @@ export class RestaurantService {
     } catch (error) {
       return {
         ok: false,
-        error: 'Cloud not find restaurant.',
+        error: 'Could not find restaurant.',
       };
     }
   }
