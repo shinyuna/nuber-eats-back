@@ -1,6 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { timingSafeEqual } from 'crypto';
 import { PubSub } from 'graphql-subscriptions';
 import { NEW_CHECKED_ORDER, NEW_ORDER_UPDATE, NEW_PENDING_ORDER, PUB_SUB } from 'src/common/common.constants';
 import { Dish } from 'src/restaurants/entities/dish.entity';
@@ -30,22 +29,25 @@ export class OrderService {
     if (!order) {
       return { error: 'Order not found.' };
     }
+
     const checkCustomer = user.role === UserRole.Client && order.customerId !== user.id;
     const checkDriver = user.role === UserRole.Delivery && order.driverId !== user.id;
     const checkOwner = user.role === UserRole.Owner && order.restaurant.ownerId !== user.id;
     if (checkCustomer || checkDriver || checkOwner) {
       return { error: "You can't not do that." };
     }
+
     return { order };
   }
 
   async createOrder(customer: User, { restaurantId, items }: CreateOrderInput): Promise<CreateOrderOutput> {
     try {
       const restaurant = await this.restaurants.findOne(restaurantId);
+      const orderItems: OrderItem[] = [];
+      let orderFinalPrice = 0;
+
       if (!restaurant) return { ok: false, error: 'Restaurant not found.' };
 
-      let orderFinalPrice = 0;
-      const orderItems: OrderItem[] = [];
       for (const item of items) {
         const dish = await this.dishes.findOne(item.dishId);
         if (!dish) {
@@ -59,18 +61,14 @@ export class OrderService {
         for (const itemOption of item.options) {
           const dishOption = dish.options.find(dishOption => dishOption.name === itemOption.name);
           if (dishOption) {
-            if (dishOption.price) {
-              dishFinalPrice += dishOption.price;
-            } else {
-              if (dishOption.choices) {
-                const usePriceDish = dishOption.choices.filter(item => item.price);
-                if (usePriceDish.length != 0) {
-                  const choiceOptionPrice = usePriceDish
-                    .filter(option => itemOption.choice.indexOf(option.name) > -1)
-                    .map(option => option.price);
-                  const choiceFinalPrice = choiceOptionPrice.reduce((a, b) => a + b);
-                  dishFinalPrice += choiceFinalPrice;
-                }
+            if (dishOption.choices) {
+              const usePriceDish = dishOption.choices.filter(item => item.price);
+              if (usePriceDish.length !== 0) {
+                const choiceOptionPrice = usePriceDish
+                  .filter(option => itemOption.choice.indexOf(option.name) > -1)
+                  .map(option => option.price);
+                const choiceFinalPrice = choiceOptionPrice.reduce((a, b) => a + b);
+                dishFinalPrice += choiceFinalPrice;
               }
             }
           }
@@ -79,10 +77,10 @@ export class OrderService {
         const orderItem = await this.orderItem.save(this.orderItem.create({ dish, options: item.options }));
         orderItems.push(orderItem);
       }
+
       const order = await this.orders.save(
         this.orders.create({ customer, restaurant, items: orderItems, total: orderFinalPrice }),
       );
-
       await this.pubSub.publish(NEW_PENDING_ORDER, { pendingOrders: { order, ownerId: restaurant.ownerId } });
       return {
         ok: true,
