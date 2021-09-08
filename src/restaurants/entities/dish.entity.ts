@@ -1,5 +1,5 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
-import { IsNumber, IsString, Length, Min } from 'class-validator';
+import { IsBoolean, IsNumber, IsString, Length, max, Max, Min } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
 import { Restaurant } from './restaurant.entity';
@@ -11,9 +11,9 @@ export class DishChoice {
   @IsString()
   name: string;
 
-  @Field(type => Int, { nullable: true, defaultValue: 0 })
+  @Field(type => Int, { defaultValue: 0 })
   @IsNumber()
-  price?: number;
+  price: number;
 }
 
 @InputType('DishOptionInputType', { isAbstract: true })
@@ -23,13 +23,21 @@ export class DishOption {
   @IsString()
   name: string;
 
-  @Field(type => [DishChoice])
-  choices: DishChoice[];
+  @Field(type => [DishChoice], { nullable: true })
+  choices?: DishChoice[];
 
-  @Field(typs => Int, { nullable: true, defaultValue: 1 })
+  @Field(type => Boolean, { defaultValue: false })
+  @IsBoolean()
+  isRequired: boolean;
+
+  @Field(type => Int, { defaultValue: 0 })
+  @IsNumber()
+  min: number;
+
+  @Field(typs => Int, { defaultValue: 1 })
   @IsNumber()
   @Min(1)
-  max?: number;
+  max: number;
 }
 
 @InputType('DishInputType', { isAbstract: true })
@@ -44,7 +52,7 @@ export class Dish extends CoreEntity {
   @Field(type => String)
   @Column()
   @IsString()
-  @Length(10, 120)
+  @Length(5, 120)
   description: string;
 
   @Field(type => Int)
