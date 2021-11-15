@@ -5,7 +5,8 @@ import { Order } from 'src/orders/entities/order.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, ManyToOne, OneToMany, RelationId } from 'typeorm';
 import { Category } from './category.entity';
-import { Dish } from './dish.entity';
+import { DishGroup } from '../../dish/entities/dish-group.entity';
+import { Dish } from '@/dish/entities/dish.entity';
 @InputType('RestaurantInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
@@ -36,6 +37,10 @@ export class Restaurant extends CoreEntity {
 
   @RelationId((restaurant: Restaurant) => restaurant.owner)
   ownerId: number;
+
+  @Field(type => [DishGroup])
+  @OneToMany(type => DishGroup, dishGroup => dishGroup.restaurant)
+  menuGroup: DishGroup[];
 
   @Field(type => [Dish])
   @OneToMany(type => Dish, dish => dish.restaurant)
