@@ -13,10 +13,6 @@ import { FindRestaurantByCategoryInput, FindRestaurantByCategoryOutput } from '.
 import { GetRestaurantsInput, GetRestaurantsOutput } from './dtos/get-restaurants.dto';
 import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto';
 import { FindRestaurantInput, FindRestaurantOutput } from './dtos/find-restaurant-by-name.dto';
-import { Dish } from './entities/dish.entity';
-import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
-import { EditDishInput, EditDishOutput } from './dtos/edit-dish.dto';
-import { DeleteDishInput, DeleteDishOutput } from './dtos/delete-dish.dto';
 import { GetRestaurantsByOwnerOutput } from './dtos/get-restaurant-by-owner';
 
 @Resolver(of => Restaurant)
@@ -100,28 +96,5 @@ export class CategoryResolver {
     @Args('input') categoryInput: FindRestaurantByCategoryInput,
   ): Promise<FindRestaurantByCategoryOutput> {
     return this.categoryService.findRestaurantByCategory(categoryInput);
-  }
-}
-
-@Resolver(of => Dish)
-export class DishResolver {
-  constructor(private readonly restaurantService: RestaurantService) {}
-
-  @Mutation(returns => CreateDishOutput)
-  @Role(['Owner'])
-  async createDish(@AuthUser() owner: User, @Args('input') params: CreateDishInput): Promise<CreateDishOutput> {
-    return this.restaurantService.createDish(owner, params);
-  }
-
-  @Mutation(returns => EditDishOutput)
-  @Role(['Owner'])
-  async editDish(@AuthUser() owner: User, @Args('input') params: EditDishInput): Promise<EditDishOutput> {
-    return this.restaurantService.editDish(owner, params);
-  }
-
-  @Mutation(returns => DeleteDishOutput)
-  @Role(['Owner'])
-  async deleteDish(@AuthUser() owner: User, @Args('input') params: DeleteDishInput): Promise<DeleteDishOutput> {
-    return this.restaurantService.deleteDish(owner, params);
   }
 }

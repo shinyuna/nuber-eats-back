@@ -1,8 +1,9 @@
+import { Restaurant } from '@/restaurants/entities/restaurant.entity';
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
-import { IsBoolean, IsNumber, IsString, Length, max, Max, Min } from 'class-validator';
+import { IsBoolean, IsNumber, IsString, Length, Min } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Column, Entity, ManyToOne, RelationId } from 'typeorm';
-import { Restaurant } from './restaurant.entity';
+import { DishGroup } from './dish-group.entity';
 
 @InputType('DishChoiceInputType', { isAbstract: true })
 @ObjectType()
@@ -71,6 +72,10 @@ export class Dish extends CoreEntity {
 
   @RelationId((dish: Dish) => dish.restaurant)
   restaurantId: number;
+
+  @Field(type => DishGroup)
+  @ManyToOne(type => DishGroup, dishGroup => dishGroup.menu)
+  menuGroup: DishGroup;
 
   @Field(type => [DishOption], { nullable: true })
   @Column({ type: 'json', nullable: true }) // 주인장이 option을 지우거나 변경하기 쉽게 json을 사용.

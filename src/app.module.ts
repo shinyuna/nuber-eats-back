@@ -13,7 +13,7 @@ import { Verification } from './users/entities/verification.entity';
 import { MailModule } from './mail/mail.module';
 import { Category } from './restaurants/entities/category.entity';
 import { AuthModule } from './auth/auth.module';
-import { Dish } from './restaurants/entities/dish.entity';
+import { Dish } from '@/dish/entities/dish.entity';
 import { OrdersModule } from './orders/orders.module';
 import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
@@ -22,6 +22,8 @@ import { PaymentsModule } from './payments/payments.module';
 import { Payment } from './payments/entities/payment.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UploadsModule } from './uploads/uploads.module';
+import { DishGroup } from './dish/entities/dish-group.entity';
+import { DishModule } from './dish/dish.module';
 
 @Module({
   imports: [
@@ -52,7 +54,7 @@ import { UploadsModule } from './uploads/uploads.module';
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== 'prod',
       logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
-      entities: [User, Verification, Restaurant, Category, Dish, Order, OrderItem, Payment],
+      entities: [User, Verification, Restaurant, Category, Dish, DishGroup, Order, OrderItem, Payment],
     }),
     GraphQLModule.forRoot({
       installSubscriptionHandlers: true,
@@ -80,6 +82,7 @@ import { UploadsModule } from './uploads/uploads.module';
     OrdersModule,
     CommonModule,
     PaymentsModule,
+    DishModule,
   ],
   controllers: [],
   providers: [],
